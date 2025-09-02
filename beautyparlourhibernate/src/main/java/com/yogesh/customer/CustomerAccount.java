@@ -2,7 +2,9 @@ package com.yogesh.customer;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Iterator;
 import java.util.Scanner;
+import java.util.Set;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -11,6 +13,10 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.internal.build.AllowSysOut;
 
 import com.yogesh.entities.Customer;
+
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 
 public class CustomerAccount {
 	
@@ -67,6 +73,16 @@ public class CustomerAccount {
 		customer.setCustomerPassword(scanner.next());
 		  		
 		
+		Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+		
+		Set<ConstraintViolation<Customer>> violations = validator.validate(customer);
+		Iterator<ConstraintViolation<Customer>> iterator = violations.iterator();
+		
+		while (iterator.hasNext()) {
+			ConstraintViolation<Customer> obj = iterator.next();
+			System.out.println("Error:" + obj.getPropertyPath() + " - " + obj.getMessage());
+		}
+		
 		session.persist(customer);
 		transaction.commit();
 		
@@ -96,6 +112,10 @@ public class CustomerAccount {
 		customer = session.createQuery(urlString, Customer.class).setParameter("username", username).uniqueResult();
 		
 		System.out.println("Customer Info :" + customer.toString());
+	}
+	
+	public static void main(String[] args) {
+		new CustomerAccount().newCustomerAccount();
 	}
 
 }

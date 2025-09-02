@@ -21,39 +21,47 @@ public class Customer {
 	private Integer customerId ;
 	
 	@NotNull
+	@Column(nullable = false)
 	@Pattern(regexp ="^[A-Za-z ]+$" , message = "Enter valid asset name [enter ALFA-NUMERIC VALUE]")
 	private String customerName ;
 	
 	@NotNull
+	@Column(nullable = false)
 	@Pattern(regexp = "^[0-9]{10}$" , message = "Enter valid mobile name [enter 10 Digits]")
 	private String customerMobileNo ;
 	
 	@NotNull
+	@Column(nullable = false)
 	@Email(message = "enter valid email")
 	private String customerEmail ;
 	
 	@NotNull
+	@Column(nullable = false)
 	@Pattern(regexp = "^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[0-2])-(19|20)\\d{2}$", message = "Date must be in format dd-MM-yyyy"	)
 	private Date customerDOB ;
 	
 	@NotNull
+	@Column(nullable = false)
 	@Pattern(regexp ="^[A-Za-z0-9 ]+$" , message = "Enter valid asset name [enter ALFA-NUMERIC VALUE]")
 	private String customerAddress ;
 	
 	@NotNull
-	@Pattern(regexp ="^[A-Za-z0-9]+$" , message = "Enter valid asset name [enter ALFA-NUMERIC VALUE]")
+	@Column(nullable = false)
+	@Pattern(regexp ="^[A-Za-z]+$" , message = "Enter valid asset name [enter ALFA-NUMERIC VALUE]")
 	private String customerCity ;
 	
 	@NotNull
-	@Pattern(regexp ="^[A-Za-z0-9 ]+$" , message = "Enter valid asset name [enter ALFA-NUMERIC VALUE]")
+	@Column(nullable = false)
+	@Pattern(regexp ="^[A-Za-z]+$" , message = "Enter valid asset name [enter ALFA-NUMERIC VALUE]")
 	private String customerState ;
 	
 	
-	@Column(unique = true)
+	@Column(unique = true, nullable = false)
 	@Pattern(regexp ="^[A-Za-z0-9-@#$%^*+/]+$" , message = "Enter valid asset name [enter ALFA-NUMERIC VALUE]")
 	private String customerUsername ;
 	
 	@NotNull
+	@Column(nullable = false)
 	@Pattern(regexp ="^[A-Za-z0-9-@#$%^*+/]+$" , message = "Enter valid asset name [enter ALFA-NUMERIC VALUE]")
 	private String customerPassword ;
 	

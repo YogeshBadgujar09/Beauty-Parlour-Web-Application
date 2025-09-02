@@ -22,7 +22,7 @@ public class App
     public static void main( String[] args )
     {
     		CustomerAccount customerAccount = new CustomerAccount();
-    		customerAccount.viewCustomerAccount();	
+    		customerAccount.newCustomerAccount();
     		
     }
 }
