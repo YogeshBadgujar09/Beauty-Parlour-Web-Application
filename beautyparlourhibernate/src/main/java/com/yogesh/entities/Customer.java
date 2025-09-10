@@ -1,6 +1,6 @@
 package com.yogesh.entities;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -8,8 +8,10 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Pattern;
 
 @Entity
@@ -22,7 +24,7 @@ public class Customer {
 	
 	@NotNull
 	@Column(nullable = false)
-	@Pattern(regexp ="^[A-Za-z ]+$" , message = "Enter valid asset name [enter ALFA-NUMERIC VALUE]")
+	@Pattern(regexp ="^[A-Za-z ]+$" , message = "Enter valid name [enter alphabetic value]")
 	private String customerName ;
 	
 	@NotNull
@@ -35,36 +37,35 @@ public class Customer {
 	@Email(message = "enter valid email")
 	private String customerEmail ;
 	
-	@NotNull
+	@NotNull(message = "enter date please") 
+	@Past(message = "Date of birth must be in the past")
 	@Column(nullable = false)
-	@Pattern(regexp = "^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[0-2])-(19|20)\\d{2}$", message = "Date must be in format dd-MM-yyyy"	)
-	private Date customerDOB ;
+	private LocalDate customerDOB ;
 	
 	@NotNull
 	@Column(nullable = false)
-	@Pattern(regexp ="^[A-Za-z0-9 ]+$" , message = "Enter valid asset name [enter ALFA-NUMERIC VALUE]")
+	@Pattern(regexp ="^[A-Za-z0-9]+$" , message = "Enter valid address [enter valid address use only alpha-numeric]")
 	private String customerAddress ;
 	
 	@NotNull
 	@Column(nullable = false)
-	@Pattern(regexp ="^[A-Za-z]+$" , message = "Enter valid asset name [enter ALFA-NUMERIC VALUE]")
+	@Pattern(regexp ="^[A-Za-z]+$" , message = "Enter valid city [enter alphabetic value]")
 	private String customerCity ;
 	
 	@NotNull
 	@Column(nullable = false)
-	@Pattern(regexp ="^[A-Za-z]+$" , message = "Enter valid asset name [enter ALFA-NUMERIC VALUE]")
+	@Pattern(regexp ="^[A-Za-z]+$" , message = "Enter valid state [enter alphabetic value]")
 	private String customerState ;
 	
 	
 	@Column(unique = true, nullable = false)
-	@Pattern(regexp ="^[A-Za-z0-9-@#$%^*+/]+$" , message = "Enter valid asset name [enter ALFA-NUMERIC VALUE]")
+	@Pattern(regexp ="^[A-Za-z0-9-@#$%^*+/]+$" , message = "[USERNAME] Enter valid asset name [enter ALFA-NUMERIC VALUE and Use only these symbols -@#$%^*+/ ]")
 	private String customerUsername ;
 	
 	@NotNull
 	@Column(nullable = false)
-	@Pattern(regexp ="^[A-Za-z0-9-@#$%^*+/]+$" , message = "Enter valid asset name [enter ALFA-NUMERIC VALUE]")
+	@Pattern(regexp ="^[A-Za-z0-9-@#$%^*+/]+$" , message = "[PASSWORD] Enter valid asset name [enter ALFA-NUMERIC VALUE and Use only these symbols -@#$%^*+/ ]")
 	private String customerPassword ;
-	
 	
 	public Integer getCustomerId() {
 		return customerId;
@@ -94,10 +95,11 @@ public class Customer {
 		this.customerEmail = customerEmail;
 	}
 	
-	public Date getCustomerDOB() {
+	public LocalDate getCustomerDOB() {
 		return customerDOB;
 	}
-	public void setCustomerDOB(Date customerDOB) {
+	
+	public void setCustomerDOB(LocalDate customerDOB) {
 		this.customerDOB = customerDOB;
 	}
 	
@@ -135,6 +137,7 @@ public class Customer {
 	public void setCustomerPassword(String customerPassword) {
 		this.customerPassword = customerPassword;
 	}
+	
 	
 	
 	@Override
