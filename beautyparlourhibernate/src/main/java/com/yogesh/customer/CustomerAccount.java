@@ -69,15 +69,16 @@ public class CustomerAccount {
 				System.out.println("Enter Username :");
 				String username = scanner.next();
 		
-				flag = usernameExists(username);
-				
-				if(flag) {
+				Customer customerObject = usernameExists(username);
+			
+				if(customerObject != null) {
 					System.out.println("Username Already Available .... Please try another Name");
-				}	
-				else {
+				}else {
 					customer.setCustomerUsername(username);
+					flag = true;
 				}
-			}while(flag);
+				
+			}while(!flag);
 			
 			
 			System.out.println("Enter Password :");
@@ -107,40 +108,40 @@ public class CustomerAccount {
 	public void viewCustomerAccount()
 	{
 		Scanner scanner = SingletonDesignPattern.buildScannerInstance();
-		Session session = SingletonDesignPattern.buildSessionFactoryInstance().openSession();
-	
+
 		System.out.println("Enter Username :");
 		String username = scanner.next(); 
+	
+		Customer customer = usernameExists(username);
 		
-		String urlString = "FROM Customer c WHERE c.customerUsername = : username" ;
-		
-		Customer customer = session.createQuery(urlString, Customer.class).setParameter("username", username).uniqueResult();
-		
-		if(customer.getCustomerUsername().equals(username)) {
-			System.out.println("Customer Info :" + customer.toString());
+		if(customer != null) { 
+			System.out.println("Customer Info :" + customer.toString()); 
 		}else {
-			System.out.println("Not Find");
+			System.out.println("Account With this username not found .... !!!");
 		}
 		
 	}
 	
 	
-	public boolean usernameExists(String username) {
+	public Customer usernameExists(String username) {
 
 		Session session = SingletonDesignPattern.buildSessionFactoryInstance().openSession();
 		
 		String urlString = "FROM Customer c WHERE c.customerUsername = : username" ;
 		
 		Customer customer = session.createQuery(urlString, Customer.class).setParameter("username", username).uniqueResult();
-	
+		
 		try {
-			if(customer.getCustomerUsername().equals(username)) {
-				return true;
+			if(customer.getCustomerUsername().equals(username)) { 			
+				return customer;
 			}
-		}catch (NullPointerException e) {
-			
-		}
-		return false;
+		}catch (Exception e) {}
+		
+		return null;
+	}
+	
+	public void updateCustomerAccount() {
+		Session session = SingletonDesignPattern.buildSessionFactoryInstance().openSession(); 
 	}
 	
 	public static void main(String[] args) {
