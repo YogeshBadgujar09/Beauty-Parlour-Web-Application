@@ -20,6 +20,8 @@ public class Customer {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	
+	
 	private Integer customerId ;
 	
 	@NotNull
@@ -44,20 +46,20 @@ public class Customer {
 	
 	@NotNull
 	@Column(nullable = false)
-	@Pattern(regexp ="^[A-Za-z0-9]+$" , message = "Enter valid address [enter valid address use only alpha-numeric]")
+	@Pattern(regexp ="^[A-Za-z0-9 ,./-]+$" , message = "Enter valid address [enter valid address use only alpha-numeric]")
 	private String customerAddress ;
 	
 	@NotNull
 	@Column(nullable = false)
-	@Pattern(regexp ="^[A-Za-z]+$" , message = "Enter valid city [enter alphabetic value]")
+	@Pattern(regexp ="^[A-Za-z ]+$" , message = "Enter valid city [enter alphabetic value]")
 	private String customerCity ;
 	
 	@NotNull
 	@Column(nullable = false)
-	@Pattern(regexp ="^[A-Za-z]+$" , message = "Enter valid state [enter alphabetic value]")
+	@Pattern(regexp ="^[A-Za-z ]+$" , message = "Enter valid state [enter alphabetic value]")
 	private String customerState ;
 	
-	
+	@NotNull
 	@Column(unique = true, nullable = false)
 	@Pattern(regexp ="^[A-Za-z0-9-@#$%^*+/]+$" , message = "[USERNAME] Enter valid asset name [enter ALFA-NUMERIC VALUE and Use only these symbols -@#$%^*+/ ]")
 	private String customerUsername ;
@@ -69,7 +71,7 @@ public class Customer {
 	
 	public Integer getCustomerId() {
 		return customerId;
-	}
+	} 
 	public void setCustomerId(Integer customerId) {
 		this.customerId = customerId;
 	}

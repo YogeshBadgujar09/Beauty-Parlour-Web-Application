@@ -1,67 +1,48 @@
 package com.yogesh.customer;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.util.Iterator;
+import java.net.PasswordAuthentication;
 import java.util.Scanner;
-import java.util.Set;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.grammars.hql.HqlParser.AndPredicateContext;
+import org.hibernate.query.sqm.TerminalPathException;
+import org.hibernate.validator.constraints.ISBN;
 
+import com.google.protobuf.Method;
 import com.yogesh.entities.Customer;
+import com.yogesh.entities.CustomerInformationOptimize;
 import com.yogesh.util.singletondesignpattern.SingletonDesignPattern;
 
-import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
 
 public class CustomerAccount {
 	
+	private Scanner scanner;
+	private CustomerInformationOptimize customerInformationOptimize ;
+	private Customer customer;
+	
+	/**
+	 * newCustomerAccount method is define for create new customer account in this web-application.
+	 * In this method use buildScannerInstance() for create Scanner object, which follow Singleton Design Pattern.
+	 * Also use buildSessionFactoryInstance() which return Session object and its also follow Singleton Design Pattern.
+	 * SingletonDesignPattern.validationCheck(customer) is used for Customer Information Validation.  
+	 */
+	
 	public void newCustomerAccount() {
 		
-		Customer customer = new Customer();
-		Scanner scanner = SingletonDesignPattern.buildScannerInstance();
-		DateTimeFormatter formatter;
-
+		customer = new Customer();
+		customerInformationOptimize = new CustomerInformationOptimize();
+		scanner = SingletonDesignPattern.buildScannerInstance();
+		
 		try {
 			
 			Session session = SingletonDesignPattern.buildSessionFactoryInstance().openSession();
 			Transaction transaction = session.beginTransaction();
 			
-			System.out.println(" Fill The Information \n\n");
+			System.out.println("++++++++++++ Create New Customer ++++++++++++++ \n\n");
 			    		
-			System.out.println("Enter Full Name :");
-			customer.setCustomerName(scanner.nextLine());
-			
-			System.out.println("Enter Mobile No. :");
-			customer.setCustomerMobileNo(scanner.next());			
-			System.out.println("Enter Email Id :");
-			customer.setCustomerEmail(scanner.next());
-			
-			System.out.println("Enter DOB :");
-			String dateString = scanner.next();
-			
-			try {
-				formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-				LocalDate localDate =  LocalDate.parse(dateString, formatter);
-				customer.setCustomerDOB(localDate);
-			}catch (DateTimeParseException e) {
-				// TODO: handle exception
-			}
-			
-			scanner.nextLine();
-			System.out.println("Enter Address :");
-			customer.setCustomerAddress(scanner.nextLine());
-			
-			System.out.println("Enter City :");
-			customer.setCustomerCity(scanner.next());
-			
-			scanner.nextLine();
-			System.out.println("Enter State :");
-			customer.setCustomerState(scanner.nextLine());
+			customer = customerInformationOptimize.insertCustomerInformation(customer);
 			
 			boolean flag = false;
 			do {
@@ -83,16 +64,9 @@ public class CustomerAccount {
 			
 			System.out.println("Enter Password :");
 			customer.setCustomerPassword(scanner.next()); 	
-		
-			Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 			
-			Set<ConstraintViolation<Customer>> violations = validator.validate(customer);
-			Iterator<ConstraintViolation<Customer>> iterator = violations.iterator();
 			
-			while (iterator.hasNext()) {
-				ConstraintViolation<Customer> obj = iterator.next();
-				System.out.println("Error:" + obj.getPropertyPath() + " - " + obj.getMessage());
-			}
+			SingletonDesignPattern.validationCheck(customer);
 			
 			session.persist(customer);
 			transaction.commit();
@@ -105,6 +79,12 @@ public class CustomerAccount {
 
 	}
 	
+	
+	/**
+	 * This method is define for show the customers details if username is available.
+	 * In this method SingletonDesignPattern.buildScannerInstance() is used 
+	 * which flow Singleton Design Project approach 
+	 */
 	public void viewCustomerAccount()
 	{
 		Scanner scanner = SingletonDesignPattern.buildScannerInstance();
@@ -122,7 +102,11 @@ public class CustomerAccount {
 		
 	}
 	
-	
+	/**
+	 * usenameExists method is define to search a particular customer. 
+	 * it take username for search customer and return Customer object if customer available.
+	 * It is provide code optimization for different CRUD operation r
+	 */
 	public Customer usernameExists(String username) {
 
 		Session session = SingletonDesignPattern.buildSessionFactoryInstance().openSession();
@@ -140,11 +124,71 @@ public class CustomerAccount {
 		return null;
 	}
 	
+	/**
+	 * updateCustomerAccount method is Create to update the Information of Customer 
+	 * Username and Password will not change 
+	 */
+	
 	public void updateCustomerAccount() {
+		
 		Session session = SingletonDesignPattern.buildSessionFactoryInstance().openSession(); 
+		Transaction transaction = session.beginTransaction();
+		
+		Scanner scanner = SingletonDesignPattern.buildScannerInstance();
+		customerInformationOptimize = new CustomerInformationOptimize();
+		
+		System.out.println("Enter Username :");
+		String username = scanner.next(); 
+	
+		Customer customer = usernameExists(username);
+		
+		if(customer != null) { 
+			
+			System.out.println("+++++++++++++++ CONFIRM PROFILE ++++++++++++++++++++\n\n" + customer.toString());
+				
+			System.out.println("*********************** UPDATE PROFILE ************************");
+
+			scanner.nextLine();
+			customerInformationOptimize.insertCustomerInformation(customer);
+			
+			SingletonDesignPattern.validationCheck(customer);
+
+			session.update(customer);
+			transaction.commit();
+			
+			session.close();
+			
+		}else {
+			System.out.println("Account With this username not found .... !!!");
+		}	
 	}
 	
+	public void deleteCustomer() {
+		
+		Scanner scanner = SingletonDesignPattern.buildScannerInstance();
+		Session session = SingletonDesignPattern.buildSessionFactoryInstance().openSession(); 
+		Transaction transaction = session.beginTransaction();
+		
+		System.out.println("Enter Username :");
+		String username = scanner.next(); 
+	
+		Customer customer = usernameExists(username);
+		
+		if(customer != null) { 
+			
+			System.out.println("+++++++++++++++ CONFIRM PROFILE ++++++++++++++++++++\n\n" + customer.toString());
+			
+			session.delete(customer);
+			transaction.commit();
+			
+			session.close();
+			
+		}else {
+			System.out.println("Account With this username not found .... !!!");
+		}	
+		
+	}
 	public static void main(String[] args) {
-		new CustomerAccount().newCustomerAccount();
+				new CustomerAccount().newCustomerAccount();
 	}
 }
