@@ -20,8 +20,6 @@ public class Customer {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	
-	
 	private Integer customerId ;
 	
 	@NotNull
@@ -68,6 +66,10 @@ public class Customer {
 	@Column(nullable = false)
 	@Pattern(regexp ="^[A-Za-z0-9-@#$%^*+/]+$" , message = "[PASSWORD] Enter valid asset name [enter ALFA-NUMERIC VALUE and Use only these symbols -@#$%^*+/ ]")
 	private String customerPassword ;
+	
+	@NotNull
+	@Column(nullable = false)
+	private LocalDate customerCreateDate;
 	
 	public Integer getCustomerId() {
 		return customerId;
@@ -140,7 +142,12 @@ public class Customer {
 		this.customerPassword = customerPassword;
 	}
 	
-	
+	public LocalDate getCustomerCreateDate() {
+		return customerCreateDate;
+	}
+	public void setCustomerCreateDate(LocalDate customerCreateDate) {
+		this.customerCreateDate = customerCreateDate;
+	}
 	
 	@Override
 	public String toString() {
@@ -148,7 +155,6 @@ public class Customer {
 				+ customerMobileNo + ", customerEmail=" + customerEmail + ", customerDOB=" + customerDOB
 				+ ", customerAddress=" + customerAddress + ", customerCity=" + customerCity + ", customerState="
 				+ customerState + ", customerUsername=" + customerUsername + ", customerPassword=" + customerPassword
-				+ "]";
-	}
-	
+				+ ", customerCreateDate=" + customerCreateDate + "]";
+	}	
 }

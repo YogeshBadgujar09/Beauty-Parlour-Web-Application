@@ -1,17 +1,13 @@
 package com.yogesh.customer;
 
-import java.net.PasswordAuthentication;
+import java.time.LocalDate;
 import java.util.Scanner;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.grammars.hql.HqlParser.AndPredicateContext;
-import org.hibernate.query.sqm.TerminalPathException;
-import org.hibernate.validator.constraints.ISBN;
+import org.mindrot.jbcrypt.BCrypt;
 
-import com.google.protobuf.Method;
 import com.yogesh.entities.Customer;
-import com.yogesh.entities.CustomerInformationOptimize;
 import com.yogesh.util.singletondesignpattern.SingletonDesignPattern;
 
 import jakarta.validation.ConstraintViolationException;
@@ -21,6 +17,8 @@ public class CustomerAccount {
 	private Scanner scanner;
 	private CustomerInformationOptimize customerInformationOptimize ;
 	private Customer customer;
+	private Session session ;
+	private Transaction transaction;
 	
 	/**
 	 * newCustomerAccount method is define for create new customer account in this web-application.
@@ -31,6 +29,7 @@ public class CustomerAccount {
 	
 	public void newCustomerAccount() {
 		
+
 		customer = new Customer();
 		customerInformationOptimize = new CustomerInformationOptimize();
 		scanner = SingletonDesignPattern.buildScannerInstance();
@@ -63,8 +62,11 @@ public class CustomerAccount {
 			
 			
 			System.out.println("Enter Password :");
-			customer.setCustomerPassword(scanner.next()); 	
+			String password = scanner.next();
+			String encryptedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+			customer.setCustomerPassword(encryptedPassword); 	
 			
+			customer.setCustomerCreateDate(LocalDate.now());
 			
 			SingletonDesignPattern.validationCheck(customer);
 			
@@ -76,7 +78,6 @@ public class CustomerAccount {
 		}catch (ConstraintViolationException e) {
 				System.out.println("Please enter valid Data ");
 		}
-
 	}
 	
 	
@@ -98,8 +99,7 @@ public class CustomerAccount {
 			System.out.println("Customer Info :" + customer.toString()); 
 		}else {
 			System.out.println("Account With this username not found .... !!!");
-		}
-		
+		}	
 	}
 	
 	/**
@@ -124,9 +124,27 @@ public class CustomerAccount {
 		return null;
 	}
 	
+	
+	public Customer customerExistsWithMobile(String customerMobileNo) {
+
+		Session session = SingletonDesignPattern.buildSessionFactoryInstance().openSession();
+		
+		String urlString = "FROM Customer c WHERE c.customerMobileNo = : customerMobileNo " ;
+		
+		Customer customer = session.createQuery(urlString, Customer.class).setParameter("customerMobileNo", customerMobileNo).uniqueResult();
+		
+		try {
+			if(customer.getCustomerMobileNo().equals(customerMobileNo)) { 			
+				return customer;
+			}
+		}catch (Exception e) {}
+		
+		return null;
+	}
+	
 	/**
 	 * updateCustomerAccount method is Create to update the Information of Customer 
-	 * Username and Password will not change 
+	 * username and Password will not change 
 	 */
 	
 	public void updateCustomerAccount() {
@@ -147,20 +165,26 @@ public class CustomerAccount {
 			System.out.println("+++++++++++++++ CONFIRM PROFILE ++++++++++++++++++++\n\n" + customer.toString());
 				
 			System.out.println("*********************** UPDATE PROFILE ************************");
-
-			scanner.nextLine();
-			customerInformationOptimize.insertCustomerInformation(customer);
 			
-			SingletonDesignPattern.validationCheck(customer);
+			try {
+				
+				scanner.nextLine();
+				customerInformationOptimize.insertCustomerInformation(customer);
+				SingletonDesignPattern.validationCheck(customer);
+				session.update(customer);
+				transaction.commit();
+				session.close();
 
-			session.update(customer);
-			transaction.commit();
+			}catch(ConstraintViolationException e) {
+				System.out.println("Enter Valid Data ... !!!");
+			}
 			
-			session.close();
+			
 			
 		}else {
 			System.out.println("Account With this username not found .... !!!");
 		}	
+	
 	}
 	
 	public void deleteCustomer() {
@@ -188,7 +212,9 @@ public class CustomerAccount {
 		}	
 		
 	}
+	
+	
 	public static void main(String[] args) {
-				new CustomerAccount().newCustomerAccount();
+		new CustomerAccount().updateCustomerAccount();
 	}
 }
